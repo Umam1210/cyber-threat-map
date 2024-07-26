@@ -112,7 +112,7 @@ export const Map = ({ data }: MapProps) => {
   }, [data]);
 
   return (
-    <div style={{ width: "96vw", height: "100vh" }}>
+    <div style={{ width: "96vw", height: "96vh" }}>
       <svg ref={svgRef} style={{ width: "100%", height: "100%" }}></svg>
     </div>
   );
