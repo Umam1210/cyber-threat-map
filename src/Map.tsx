@@ -27,10 +27,22 @@ export const Map = ({ data }: MapProps) => {
       .geoMercator()
       .scale(width / 2 / Math.PI - 40)
       .center([-90, 70.5]);
-    const geoPathGenerator = d3.geoPath().projection(projection);
+    
+    
+   const geoPathGenerator = d3.geoPath().projection(projection);
 
     // Clear previous elements
     svg.selectAll("*").remove();
+
+    // Create a tooltip
+    const tooltip = d3.select("body").append("div")
+      .attr("class", "tooltip")
+      .style("position", "absolute")
+      .style("visibility", "hidden")
+      .style("background-color", "white")
+      .style("border", "solid 1px black")
+      .style("padding", "5px")
+      .style("border-radius", "5px");
 
     svg
       .selectAll(".country")
@@ -42,7 +54,18 @@ export const Map = ({ data }: MapProps) => {
       .attr("stroke", "rgba(29,91,85,1)")
       .attr("strokeWidth", 0.1)
       .attr("fill", "rgba(29,91,85,1)")
-      .attr("fillOpacity", 1);
+      .attr("fillOpacity", 1)
+      .on("mouseover", function(event, d) {
+        d3.select(this).attr("fill", "orange");
+        tooltip.style("visibility", "visible").text(d.properties.name);
+      })
+      .on("mousemove", function(event) {
+        tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px");
+      })
+      .on("mouseout", function() {
+        d3.select(this).attr("fill", "rgba(29,91,85,1)");
+        tooltip.style("visibility", "hidden");
+      });
 
     let connectionIndex = 0;
 
@@ -61,7 +84,7 @@ export const Map = ({ data }: MapProps) => {
         })
         .attr("d", geoPathGenerator as any)
         .attr("stroke", "#d11d1d")
-        .attr("strokeWidth", 9)
+        .attr("strokeWidth", 2)
         .attr("fill", "none");
 
       const totalLength = connectionPath.node().getTotalLength();
@@ -82,12 +105,15 @@ export const Map = ({ data }: MapProps) => {
 
     const intervalId = setInterval(addConnection, 5000);
 
-    return () => clearInterval(intervalId);
+    return () => {
+      clearInterval(intervalId);
+      tooltip.remove();
+    };
   }, [data]);
 
   return (
-    <div style={{ width: "96vw", height: "60svh" }}>
-      <svg ref={svgRef} style={{ width: "90vw", height: "50vw" }}></svg>
+    <div style={{ width: "96vw", height: "100vh" }}>
+      <svg ref={svgRef} style={{ width: "100%", height: "100%" }}></svg>
     </div>
   );
 };
