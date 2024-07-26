@@ -3,8 +3,6 @@ import * as d3 from "d3";
 import { FeatureCollection } from "geojson";
 
 type MapProps = {
-  width: number;
-  height: number;
   data: FeatureCollection;
 };
 
@@ -18,15 +16,17 @@ const CONNECTIONS_DATA = [
   { start: [-0.1276, 51.5074], end: [37.6173, 55.7558] }, 
 ];
 
-export const Map = ({ width, height, data }: MapProps) => {
+export const Map = ({ data }: MapProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
     const svg = d3.select(svgRef.current);
+    const width = svg.node().clientWidth;
+    const height = svg.node().clientHeight;
     const projection = d3
       .geoMercator()
       .scale(width / 2 / Math.PI - 40)
-      .center([10, 35]);
+      .center([-90, 70.5]);
     const geoPathGenerator = d3.geoPath().projection(projection);
 
     // Clear previous elements
@@ -39,9 +39,9 @@ export const Map = ({ width, height, data }: MapProps) => {
       .append("path")
       .attr("class", "country")
       .attr("d", geoPathGenerator as any)
-      .attr("stroke", "blue")
-      .attr("strokeWidth", 0.9)
-      .attr("fill", "grey")
+      .attr("stroke", "rgba(29,91,85,1)")
+      .attr("strokeWidth", 0.1)
+      .attr("fill", "rgba(29,91,85,1)")
       .attr("fillOpacity", 1);
 
     let connectionIndex = 0;
@@ -83,7 +83,11 @@ export const Map = ({ width, height, data }: MapProps) => {
     const intervalId = setInterval(addConnection, 5000);
 
     return () => clearInterval(intervalId);
-  }, [data, width, height]);
+  }, [data]);
 
-  return <svg ref={svgRef} width={width} height={height}></svg>;
+  return (
+    <div style={{ width: "96vw", height: "60svh" }}>
+      <svg ref={svgRef} style={{ width: "90vw", height: "50vw" }}></svg>
+    </div>
+  );
 };
