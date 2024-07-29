@@ -74,7 +74,7 @@ export const Map = ({ data }: MapProps) => {
         .attr("stroke-width", 0.07)
         .attr("fill", "#007FE3")
         .attr("fillOpacity", 1)
-        .on("mouseover", function(event, d) {
+        .on("mouseover", function(d) {
           d3.select(this).attr("fill", "orange");
           tooltip.style("visibility", "visible").text(d?.properties?.name);
         })
