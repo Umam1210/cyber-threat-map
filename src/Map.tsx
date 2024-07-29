@@ -33,6 +33,25 @@ export const Map = ({ data }: MapProps) => {
     // Clear previous elements
     svg.selectAll("*").remove();
 
+    // Define the gradient
+    svg.append("defs")
+      .append("linearGradient")
+      .attr("id", "gradient")
+      .attr("x1", "0%")
+      .attr("y1", "0%")
+      .attr("x2", "100%")
+      .attr("y2", "100%")
+      .selectAll("stop")
+      .data([
+        { offset: "0%", color: "red" },
+        { offset: "50%", color: "#BF2DE3" },
+        { offset: "100%", color: "#0015D2" }
+      ])
+      .enter()
+      .append("stop")
+      .attr("offset", d => d.offset)
+      .attr("stop-color", d => d.color);
+
     // Create a tooltip
     const tooltip = d3.select("body").append("div")
       .attr("class", "tooltip")
@@ -101,8 +120,8 @@ export const Map = ({ data }: MapProps) => {
           coordinates: [connection.start, connection.end],
         })
         .attr("d", geoPathGenerator as any)
-        .attr("stroke", "#ff5733")
-        .attr("stroke-width", 3) // Set stroke width to 5 px
+        .attr("stroke", "url(#gradient)") 
+        .attr("stroke-width", 3)
         .attr("stroke-linecap", "round")
         .attr("stroke-linejoin", "round")
         .attr("fill", "none");
@@ -116,8 +135,7 @@ export const Map = ({ data }: MapProps) => {
         .duration(5000)
         .ease(d3.easeLinear)
         .attr("stroke-dashoffset", 0)
-        .attr("stroke-width", 3) // Maintain stroke width during transition
-        .attr("stroke", "#ff5733") // Change color during transition
+        .attr("stroke-width", 3)
         .on("end", () => {
           connectionPath.transition().duration(1000).attr("opacity", 0).remove();
 
@@ -133,7 +151,7 @@ export const Map = ({ data }: MapProps) => {
               .style("text-anchor", "middle")
               .text(connection.endName)
               .transition()
-              .delay(1000)
+              .delay(1500)
               .duration(1000)
               .attr("opacity", 0)
               .remove();
