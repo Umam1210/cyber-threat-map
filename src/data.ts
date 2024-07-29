@@ -1,4 +1,6 @@
-export const data = {
+import { FeatureCollection } from 'geojson';
+
+export const data : FeatureCollection = {
   type: "FeatureCollection",
   features: [
     {

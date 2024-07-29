@@ -3,7 +3,7 @@ import * as d3 from "d3";
 import { FeatureCollection } from "geojson";
 
 type MapProps = {
-  data: FeatureCollection;
+  data: FeatureCollection
 };
 
 const CONNECTIONS_DATA = [
