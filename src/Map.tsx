@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import * as d3 from "d3";
 import { FeatureCollection } from "geojson";
 
@@ -21,8 +21,8 @@ export const Map = ({ data }: MapProps) => {
 
   useEffect(() => {
     const svg = d3.select(svgRef.current);
-    const width = svg.node().clientWidth;
-    const height = svg.node().clientHeight;
+    const width = svg.node()?.clientWidth ?? 0;
+
     const projection = d3
       .geoMercator()
       .scale(width / 2 / Math.PI - 40)
@@ -62,111 +62,113 @@ export const Map = ({ data }: MapProps) => {
       .style("padding", "5px")
       .style("border-radius", "5px");
 
-    svg
-      .selectAll(".country")
-      .data(data.features.filter((shape) => shape.id !== "ATA"))
-      .enter()
-      .append("path")
-      .attr("class", "country")
-      .attr("d", geoPathGenerator as any)
-      .attr("stroke", "#007FE3")
-      .attr("stroke-width", 0.07)
-      .attr("fill", "#007FE3")
-      .attr("fillOpacity", 1)
-      .on("mouseover", function(event, d) {
-        d3.select(this).attr("fill", "orange");
-        tooltip.style("visibility", "visible").text(d.properties.name);
-      })
-      .on("mousemove", function(event) {
-        tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px");
-      })
-      .on("mouseout", function() {
-        d3.select(this).attr("fill", "#007FE3");
-        tooltip.style("visibility", "hidden");
-      });
-
-    let connectionIndex = 0;
-
-    const addConnection = () => {
-      if (connectionIndex >= CONNECTIONS_DATA.length) {
-        connectionIndex = 0;
-      }
-
-      const connection = CONNECTIONS_DATA[connectionIndex];
-
-      const startProjection = projection(connection.start);
-      const endProjection = projection(connection.end);
-
-      // Clear previous text
-      svg.selectAll("text").remove();
-
-      // Create text label for start
-      if (startProjection) {
-        svg
-          .append("text")
-          .attr("x", startProjection[0])
-          .attr("y", startProjection[1])
-          .attr("dy", -10)
-          .attr("fill", "white")
-          .style("font-size", "12px")
-          .style("text-anchor", "middle")
-          .text(connection.startName);
-      }
-
-      const connectionPath = svg
+    if (svgRef.current) {
+      svg
+        .selectAll(".country")
+        .data(data.features.filter((shape) => shape.id !== "ATA"))
+        .enter()
         .append("path")
-        .datum({
-          type: "LineString",
-          coordinates: [connection.start, connection.end],
-        })
+        .attr("class", "country")
         .attr("d", geoPathGenerator as any)
-        .attr("stroke", "url(#gradient)") 
-        .attr("stroke-width", 3)
-        .attr("stroke-linecap", "round")
-        .attr("stroke-linejoin", "round")
-        .attr("fill", "none");
-
-      const totalLength = connectionPath.node().getTotalLength();
-
-      connectionPath
-        .attr("stroke-dasharray", totalLength + " " + totalLength)
-        .attr("stroke-dashoffset", totalLength)
-        .transition()
-        .duration(5000)
-        .ease(d3.easeLinear)
-        .attr("stroke-dashoffset", 0)
-        .attr("stroke-width", 3)
-        .on("end", () => {
-          connectionPath.transition().duration(1000).attr("opacity", 0).remove();
-
-          // Create text label for end
-          if (endProjection) {
-            svg
-              .append("text")
-              .attr("x", endProjection[0])
-              .attr("y", endProjection[1])
-              .attr("dy", -10)
-              .attr("fill", "white")
-              .style("font-size", "12px")
-              .style("text-anchor", "middle")
-              .text(connection.endName)
-              .transition()
-              .delay(1500)
-              .duration(1000)
-              .attr("opacity", 0)
-              .remove();
-          }
+        .attr("stroke", "#007FE3")
+        .attr("stroke-width", 0.07)
+        .attr("fill", "#007FE3")
+        .attr("fillOpacity", 1)
+        .on("mouseover", function(event, d) {
+          d3.select(this).attr("fill", "orange");
+          tooltip.style("visibility", "visible").text(d?.properties?.name);
+        })
+        .on("mousemove", function(event) {
+          tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px");
+        })
+        .on("mouseout", function() {
+          d3.select(this).attr("fill", "#007FE3");
+          tooltip.style("visibility", "hidden");
         });
 
-      connectionIndex++;
-    };
+      let connectionIndex = 0;
 
-    const intervalId = setInterval(addConnection, 5000);
+      const addConnection = () => {
+        if (connectionIndex >= CONNECTIONS_DATA.length) {
+          connectionIndex = 0;
+        }
 
-    return () => {
-      clearInterval(intervalId);
-      tooltip.remove();
-    };
+        const connection = CONNECTIONS_DATA[connectionIndex];
+
+        const startProjection = projection(connection.start as [number, number]);
+        const endProjection = projection(connection.end as [number, number]);
+
+        // Clear previous text
+        svg.selectAll("text").remove();
+
+        // Create text label for start
+        if (startProjection) {
+          svg
+            .append("text")
+            .attr("x", startProjection[0])
+            .attr("y", startProjection[1])
+            .attr("dy", -10)
+            .attr("fill", "white")
+            .style("font-size", "12px")
+            .style("text-anchor", "middle")
+            .text(connection.startName);
+        }
+
+        const connectionPath = svg
+          .append("path")
+          .datum({
+            type: "LineString",
+            coordinates: [connection.start, connection.end],
+          })
+          .attr("d", geoPathGenerator as any)
+          .attr("stroke", "url(#gradient)") 
+          .attr("stroke-width", 3)
+          .attr("stroke-linecap", "round")
+          .attr("stroke-linejoin", "round")
+          .attr("fill", "none");
+
+        const totalLength = connectionPath?.node()?.getTotalLength() ?? 0;
+
+        connectionPath
+          .attr("stroke-dasharray", totalLength + " " + totalLength)
+          .attr("stroke-dashoffset", totalLength)
+          .transition()
+          .duration(5000)
+          .ease(d3.easeLinear)
+          .attr("stroke-dashoffset", 0)
+          .attr("stroke-width", 3)
+          .on("end", () => {
+            connectionPath.transition().duration(1000).attr("opacity", 0).remove();
+
+            // Create text label for end
+            if (endProjection) {
+              svg
+                .append("text")
+                .attr("x", endProjection[0])
+                .attr("y", endProjection[1])
+                .attr("dy", -10)
+                .attr("fill", "white")
+                .style("font-size", "12px")
+                .style("text-anchor", "middle")
+                .text(connection.endName)
+                .transition()
+                .delay(1500)
+                .duration(1000)
+                .attr("opacity", 0)
+                .remove();
+            }
+          });
+
+        connectionIndex++;
+      };
+
+      const intervalId = setInterval(addConnection, 5000);
+
+      return () => {
+        clearInterval(intervalId);
+        tooltip.remove();
+      };
+    }
   }, [data]);
 
   return (
