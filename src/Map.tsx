@@ -135,7 +135,7 @@ export const Map = ({ data }: MapProps) => {
           .attr("stroke-dashoffset", totalLength)
           .transition()
           .duration(5000)
-          .ease(d3.easeQuadOut)
+          .ease(d3.easeLinear)
           .attr("stroke-dashoffset", 0)
           .attr("stroke-width", 3)
           .on("end", () => {
