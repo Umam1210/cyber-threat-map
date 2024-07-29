@@ -74,17 +74,18 @@ export const Map = ({ data }: MapProps) => {
         .attr("stroke-width", 0.07)
         .attr("fill", "#007FE3")
         .attr("fillOpacity", 1)
-        .on("mouseover", function(d) {
-          d3.select(this).attr("fill", "orange");
+        .on("mouseover", function(_, d) {
+          d3.select(this).attr("fill", "white");
           tooltip.style("visibility", "visible").text(d?.properties?.name);
         })
-        .on("mousemove", function(event) {
-          tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px");
+        .on("mousemove", function(event: MouseEvent) {
+          tooltip.style("top", (event.pageY - 5) + "px").style("left", (event.pageX + 5) + "px");
         })
         .on("mouseout", function() {
           d3.select(this).attr("fill", "#007FE3");
           tooltip.style("visibility", "hidden");
         });
+
 
       let connectionIndex = 0;
 
@@ -152,7 +153,7 @@ export const Map = ({ data }: MapProps) => {
                 .style("text-anchor", "middle")
                 .text(connection.endName)
                 .transition()
-                .delay(1500)
+                .delay(1200)
                 .duration(1000)
                 .attr("opacity", 0)
                 .remove();
