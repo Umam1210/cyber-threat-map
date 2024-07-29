@@ -28,7 +28,7 @@ export const Map = ({ data }: MapProps) => {
       .scale(width / 2 / Math.PI - 40)
       .center([-90, 70.5]);
 
-    const geoPathGenerator = d3.geoPath().projection(projection);
+  const geoPathGenerator: d3.GeoPath<any, d3.GeoPermissibleObjects> = d3.geoPath().projection(projection);
 
     // Clear previous elements
     svg.selectAll("*").remove();
